@@ -1,0 +1,70 @@
+<?php
+namespace App\Helpers;
+
+use DB;
+use App\Model;
+use Illuminate\Http\Request;
+
+class Helper	{
+	public static function get_sizes($id){
+        $result=DB::table('sizes')->where('id', $id)->get();
+        return $result;
+    }
+	public static function get_color($id){
+        $result=DB::table('colors')->where('id', $id)->get();
+        return $result;
+    }
+    public static function get_user($id){
+        $result=DB::table('logins')->where('id', $id)->get();
+        return $result;
+    }
+    
+    public static function get_totaluserqrcode($id){
+        $result=DB::table('qrcodes')->select(DB::raw('COUNT(*) as total_qrcode'))->where(['added_by'=>$id])->get();
+        return $result;
+    }
+    
+    public static function get_totalsystemqrcode(){
+        $result=DB::table('qrcodes')->select(DB::raw('COUNT(*) as total_qrcode'))->get();
+        return $result;
+    }
+
+    public static function get_user_qr_total_hits($id){
+        $result=DB::table('qr_traffic')->select(DB::raw('COUNT(*) as total_qr_hits'))->where(['added_by'=>$id])->get();
+        return $result;
+    }
+
+    public static function get_user_qr_total_wallate_qr(){
+       if(session()->get('USER_ROLE') == '1'){
+            $wallate =DB::table('logins')->get();
+            $total_qr = 0;
+            foreach($wallate as $qr){
+                $total_qr += $qr->total_qr;
+            }
+            return $total_qr;
+        }else{
+           $wallate =DB::table('logins')->where(['id' => session()->get('USER_ID')])->get(); 
+           $total_qr = $wallate[0]->total_qr;
+           return $total_qr;   
+        }
+    }
+
+    public static function get_user_qr_total_qr_hits(){
+       if(session()->get('USER_ROLE') == '1'){
+            $wallate =DB::table('logins')->get();
+            $total_qr = 0;
+            foreach($wallate as $qr){
+                $total_qr += $qr->total_hits;
+            }
+            return $total_qr;
+
+        }else{
+           $wallate = DB::table('logins')->where(['id' => session()->get('USER_ID')])->get(); 
+           $total_hits = $wallate[0]->total_hits;
+           return $total_hits;   
+        }
+    }
+
+
+    
+}
